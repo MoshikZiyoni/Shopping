@@ -6,7 +6,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # from rest_framework.authentication import MyAuthentication
 # from rest_framework.permissions import MyPermission
-
 from product.serialyzer import Productserializer, Cartserializer
 from product.models import Products
 from product.models import Cart
@@ -83,6 +82,7 @@ def cart_list(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
+        print (request.data)
         serializer = Cartserializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
