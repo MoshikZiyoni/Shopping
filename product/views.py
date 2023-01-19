@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # from rest_framework.authentication import MyAuthentication
 # from rest_framework.permissions import MyPermission
-from product.serialyzer import Productserializer, Cartserializer
+from product.serialyzer import Productserializer, Cartserializer,CartSerializerTwo
 from product.models import Products
 from product.models import Cart
 from rest_framework.decorators import authentication_classes, permission_classes
@@ -77,12 +77,16 @@ def cart_list(request):
     List all code snippets, or create a new snippet.
     """
     if request.method == 'GET':
+        print ('GETTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT')
         carts = Cart.objects.all()
-        serializer = Cartserializer(carts, many=True)
+        serializer = CartSerializerTwo(carts, many=True)
         return Response(serializer.data)
 
-    elif request.method == 'POST':
+    elif request.method == 'POST': 
         print (request.data)
+        # product = Products.objects.get(id=request.data["products"])
+        # print (product)
+        # request.data["products"] = product
         serializer = Cartserializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
