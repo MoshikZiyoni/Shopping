@@ -93,30 +93,30 @@ def cart_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# @authentication_classes([MyAuthentication])
-# @permission_classes([MyPermission])
-@api_view(['POST'])
-def add_to_cart(request):
-    product_id = request.data.get('product_id')
-    print (product_id,'helooS')
-    try:
-        product = Products.objects.get(id=product_id)
-    except Products.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    quantity = request.data.get('quantity')
-    # if request.user.is_authenticated:
-    user = request.user
-    # else:
-    #     return Response(status=status.HTTP_401_UNAUTHORIZED)
-    product = Products.objects.get(id=product_id)
-    cart_item, created = Cart.objects.get_or_create(user=user, product=product)
+# # @authentication_classes([MyAuthentication])
+# # @permission_classes([MyPermission])
+# @api_view(['POST'])
+# def add_to_cart(request):
+#     product_id = request.data.get('product_id')
+#     print (product_id,'helooS')
+#     try:
+#         product = Products.objects.get(id=product_id)
+#     except Products.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+#     quantity = request.data.get('quantity')
+#     # if request.user.is_authenticated:
+#     user = request.user
+#     # else:
+#     #     return Response(status=status.HTTP_401_UNAUTHORIZED)
+#     product = Products.objects.get(id=product_id)
+#     cart_item, created = Cart.objects.get_or_create(user=user, product=product)
     
-    if not created:
-        cart_item.quantity += quantity
-    else:
-        cart_item.quantity = quantity
-    cart_item.save()
-    return Response(status=status.HTTP_201_CREATED)
+#     if not created:
+#         cart_item.quantity += quantity
+#     else:
+#         cart_item.quantity = quantity
+#     cart_item.save()
+#     return Response(status=status.HTTP_201_CREATED)
 
 
 
@@ -137,10 +137,16 @@ def single_cart(request,pk):
 @api_view(['GET', 'DELETE'])
 
 def delete_cart(request,pk):
+    print (request,'request')
+    print(pk,'IDDDDDDDDDDDD')
     try:
-        product = Cart.objects.get(pk=pk)
+        
+        product = Cart.objects.filter(products_id=pk)
+        print(product,'deleteeeeee')
     except Cart.DoesNotExist:
+        print ('delte2')
         return Response(status=status.HTTP_404_NOT_FOUND)
+
     request.method == 'DELETE'
     product.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
