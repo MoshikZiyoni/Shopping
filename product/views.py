@@ -77,7 +77,7 @@ def cart_list(request):
     List all code snippets, or create a new snippet.
     """
     if request.method == 'GET':
-        print ('GETTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT')
+        print ('GETTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT')
         carts = Cart.objects.all()
         serializer = CartSerializerTwo(carts, many=True)
         return Response(serializer.data)
