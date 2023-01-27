@@ -111,10 +111,7 @@ def single_cart(request,pk):
 @api_view(['GET', 'DELETE'])
 
 def delete_cart(request,pk):
-    print (request,'request')
-    print(pk,'IDDDDDDDDDDDD')
     try:
-        
         product = Cart.objects.filter(products_id=pk)
         print(product,'deleteeeeee')
     except Cart.DoesNotExist:
@@ -128,17 +125,26 @@ def delete_cart(request,pk):
 
 @api_view(['GET', 'PUT'])
 def update_cart(request,pk):
+    print(request.data)
     try:
+        print('hello1')
+
         product = Cart.objects.get(pk=pk)
     except Cart.DoesNotExist:
+        print (request,'REQUESTTTTTTTTTTTTT')
+
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     request.method == 'PUT'
+    print('hello2')
+
     serializer = Cartserializer(product, data=request.data)
     if serializer.is_valid():
         serializer.save()
         print ('Update Success')
         return Response(serializer.data)
+    print('hello3')
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

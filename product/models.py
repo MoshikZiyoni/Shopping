@@ -23,3 +23,9 @@ class Cart(models.Model):
 # class ProductViewSet(viewsets.ModelViewSet):
 #     authentication_classes = (MyAuthentication,)
 #     permission_classes = (MyPermission,)
+
+
+class Checkout(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    products = models.ManyToManyField(Products)
+    quantity = models.DecimalField(decimal_places=2,max_digits=10)
