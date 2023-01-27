@@ -93,32 +93,6 @@ def cart_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# # @authentication_classes([MyAuthentication])
-# # @permission_classes([MyPermission])
-# @api_view(['POST'])
-# def add_to_cart(request):
-#     product_id = request.data.get('product_id')
-#     print (product_id,'helooS')
-#     try:
-#         product = Products.objects.get(id=product_id)
-#     except Products.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-#     quantity = request.data.get('quantity')
-#     # if request.user.is_authenticated:
-#     user = request.user
-#     # else:
-#     #     return Response(status=status.HTTP_401_UNAUTHORIZED)
-#     product = Products.objects.get(id=product_id)
-#     cart_item, created = Cart.objects.get_or_create(user=user, product=product)
-    
-#     if not created:
-#         cart_item.quantity += quantity
-#     else:
-#         cart_item.quantity = quantity
-#     cart_item.save()
-#     return Response(status=status.HTTP_201_CREATED)
-
-
 
 @api_view(['GET', 'POST'])
 def single_cart(request,pk):
@@ -163,6 +137,7 @@ def update_cart(request,pk):
     serializer = Cartserializer(product, data=request.data)
     if serializer.is_valid():
         serializer.save()
+        print ('Update Success')
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -17,10 +17,14 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static 
+from users import views
 
 app_name='Shopping'
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login/', views.LoginView.as_view()),
+    path('logout/', views.LogoutView.as_view()),
+    path('profile/', views.ProfileView.as_view()),
     path('product/', include('product.urls')),
 ]
 if settings.DEBUG:
