@@ -17,7 +17,7 @@ class Products(models.Model):
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    products = models.ForeignKey(Products, on_delete=models.CASCADE)
+    products = models.ForeignKey(Products, on_delete=models.CASCADE,unique=True)
     quantity=models.DecimalField(decimal_places=2,max_digits=10)
 
 # class ProductViewSet(viewsets.ModelViewSet):
