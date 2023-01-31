@@ -28,7 +28,6 @@ class CartSerializerTwo(serializers.ModelSerializer):
 
 
 class CheckoutSerializer(serializers.ModelSerializer):
-    products = Productserializer(many=True)
     class Meta:
         model = Checkout
-        fields ='__all__'
+        fields = '__all__'
