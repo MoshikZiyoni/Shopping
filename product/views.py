@@ -153,6 +153,7 @@ def save_checkout_data(request):
             cart=Cart.objects.get(id=cart_id)
         
             checkout.cart.add(cart)
+            cart.delete()
         return Response(CheckoutSerializer(checkout).data)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
