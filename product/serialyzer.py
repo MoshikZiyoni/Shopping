@@ -1,5 +1,5 @@
 from django.db import models
-from product.models import Cart,Checkout,Products
+from product.models import Cart,Products,Order
 from rest_framework import serializers
 
 class Productserializer(serializers.ModelSerializer):
@@ -27,7 +27,11 @@ class CartSerializerTwo(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CheckoutSerializer(serializers.ModelSerializer):
+
+class OrderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Checkout
+        model = Order
         fields = '__all__'
+
+
+# 

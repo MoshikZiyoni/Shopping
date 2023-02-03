@@ -5,8 +5,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # from rest_framework.authentication import MyAuthentication
 # from rest_framework.permissions import MyPermission
-from product.serialyzer import Productserializer, Cartserializer,CartSerializerTwo,Checkout,CheckoutSerializer
-from product.models import Products,User
+from product.serialyzer import Productserializer, Cartserializer,CartSerializerTwo,OrderSerializer
+from product.models import Products,User,Order
 from product.models import Cart
 from rest_framework import viewsets
 from rest_framework.decorators import authentication_classes, permission_classes
@@ -135,26 +135,18 @@ def my_view(request):
     products = Products.objects.all()
     return render(request, 'product_list.html', {'products': products})
 
-class CheckoutViewSet(viewsets.ModelViewSet):
-    queryset = Checkout.objects.all()
-    serializer_class = CheckoutSerializer
-
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 def save_checkout_data(request):
     try:
-        data = request.data.get('cartlist')
-        
-        checkout = Checkout.objects.create()
-        for item in data:
-            cart_id=item['id']
-            product_data = item['products']
-            product = Products.objects.get(id=int(product_data['id']))
-            user = User.objects.get(id=item['user']) 
-            cart=Cart.objects.get(id=cart_id)
-        
-            checkout.cart.add(cart)
-            cart.delete()
-        return Response(CheckoutSerializer(checkout).data)
+        if request.method == 'POST':
+            serializer = OrderSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif request.method == 'GET':
+            orders = Order.objects.all()
+            serializer = OrderSerializer(orders, many=True)
+            return Response(serializer.data)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
