@@ -138,6 +138,8 @@ def my_view(request):
 def save_checkout_data(request):
     if request.method == 'POST':
         cartlist = request.data.get('cartlist')
+        user_id = request.data.get('cartlist')[0]['user']
+        print(user_id)
         order = Order.objects.create() # Create the order
         for cart in cartlist:
             product = cart['products']
@@ -145,6 +147,8 @@ def save_checkout_data(request):
             product = Products.objects.get(id=product.get('id'))
             quantity = cart['quantity']
             OrderProduct.objects.create(order=order, product=product, quantity=quantity)
+        Cart.objects.filter(user=user_id).delete() # delete the cart
+
         return Response({'success': True}, status=status.HTTP_201_CREATED)
     elif request.method == 'GET':
         orders = Order.objects.all()
