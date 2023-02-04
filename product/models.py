@@ -24,8 +24,18 @@ class Cart(models.Model):
 ######Need to be Online 
 
 class Order(models.Model):
-    products = models.ForeignKey(Products, on_delete=models.CASCADE,unique=True)
+    products = models.ManyToManyField(Products)
     order_date=models.DateField(auto_now_add=True)
+    quantity = models.DecimalField(decimal_places=2, max_digits=10,null=True)
+
+class OrderProduct(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    quantity = models.DecimalField(decimal_places=2, max_digits=10)
+
+    # product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    # quantity = models.DecimalField(decimal_places=2, max_digits=10)
+
 
 # class ProductViewSet(viewsets.ModelViewSet):
 #     authentication_classes = (MyAuthentication,)

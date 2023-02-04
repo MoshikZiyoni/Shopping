@@ -6,9 +6,7 @@ from rest_framework.response import Response
 # from rest_framework.authentication import MyAuthentication
 # from rest_framework.permissions import MyPermission
 from product.serialyzer import Productserializer, Cartserializer,CartSerializerTwo,OrderSerializer
-from product.models import Products,User,Order
-from product.models import Cart
-from rest_framework import viewsets
+from product.models import OrderProduct, Products,User,Order,Cart
 from rest_framework.decorators import authentication_classes, permission_classes
 import json
 
@@ -135,18 +133,20 @@ def my_view(request):
     products = Products.objects.all()
     return render(request, 'product_list.html', {'products': products})
 
+
 @api_view(['POST', 'GET'])
 def save_checkout_data(request):
-    try:
-        if request.method == 'POST':
-            serializer = OrderSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        elif request.method == 'GET':
-            orders = Order.objects.all()
-            serializer = OrderSerializer(orders, many=True)
-            return Response(serializer.data)
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'POST':
+        cartlist = request.data.get('cartlist')
+        order = Order.objects.create() # Create the order
+        for cart in cartlist:
+            product = cart['products']
+            print (product.get('id'))
+            product = Products.objects.get(id=product.get('id'))
+            quantity = cart['quantity']
+            OrderProduct.objects.create(order=order, product=product, quantity=quantity)
+        return Response({'success': True}, status=status.HTTP_201_CREATED)
+    elif request.method == 'GET':
+        orders = Order.objects.all()
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
