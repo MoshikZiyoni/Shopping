@@ -158,6 +158,9 @@ REST_FRAMEWORK = {
        'rest_framework.authentication.SessionAuthentication',
    ],
    'DEFAULT_PERMISSION_CLASSES': [
-    #    'rest_framework.permissions.IsAuthenticated',
+       'rest_framework.permissions.IsAuthenticated',
    ],
 }
+CORS_ALLOW_ORIGIN = '*'
+CSRF_COOKIE_HTTPONLY = True
+CORS_ALLOW_CREDENTIALS = True
