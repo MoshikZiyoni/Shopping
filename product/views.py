@@ -138,8 +138,9 @@ def my_view(request):
 def save_checkout_data(request):
     if request.method == 'POST':
         cartlist = request.data.get('cartlist')
+        print (cartlist,'cartlist')
         user_id = request.data.get('cartlist')[0]['user']
-        print(user_id)
+        print(user_id,'userrrrrrr')
         order = Order.objects.create() # Create the order
         for cart in cartlist:
             product = cart['products']
