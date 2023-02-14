@@ -3,11 +3,8 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-# from rest_framework.authentication import MyAuthentication
-# from rest_framework.permissions import MyPermission
 from product.serialyzer import Productserializer, Cartserializer,CartSerializerTwo,OrderSerializer
 from product.models import OrderProduct, Products,User,Order,Cart
-from rest_framework.decorators import authentication_classes, permission_classes
 import json
 
 
@@ -21,18 +18,16 @@ def single_product(request,pk):
             json.dumps({"ERR": f"car  with id {id} not found"}),
             content_type="application/json",
         )
-
-    # Serialise your car or do something with it
     return Response(Productserializer(product).data)
 
-
+####all the products
 @api_view(['GET', 'POST'])
 def api_list(request):
     """
-    List all code snippets, or create a new snippet.
+    List of all the product, or create a new product.
     """
     if request.method == 'GET':
-        products = Products.objects.all()
+        products = Products.objects.all() ##Fetch the products
         serializer = Productserializer(products, many=True)
         return Response(serializer.data)
 
@@ -42,12 +37,12 @@ def api_list(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
-@api_view(['GET', 'DELETE'])
-
+@api_view(['DELETE'])
 def delete_product(request,pk):
     try:
-        product = Products.objects.get(pk=pk)
+        product = Products.objects.get(pk=pk) #Get the porudct and Delete by ID
     except Products.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     request.method == 'DELETE'
@@ -58,7 +53,7 @@ def delete_product(request,pk):
 @api_view(['GET', 'PUT'])
 def update_product(request,pk):
     try:
-        product = Products.objects.get(pk=pk)
+        product = Products.objects.get(pk=pk) #Get the porudct and Update by ID
     except Products.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     request.method == 'PUT'
@@ -68,17 +63,23 @@ def update_product(request,pk):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET', 'POST'])
 def cart_list(request):
     """
-    List all code snippets, or create a new snippet.
+    List of all the cart , or create a new cart.
     """
     if request.method == 'GET':
-        carts = Cart.objects.all()
-        serializer = CartSerializerTwo(carts, many=True)
+        carts = Cart.objects.all() #get all the cart 
+        serializer = CartSerializerTwo(carts, many=True) #get all the cart with the details of the product 
         return Response(serializer.data)
     elif request.method == 'POST': 
-        serializer = Cartserializer(data=request.data)
+        print (request.data)
+        user_name=(request.data.get('user'))
+        user = User.objects.filter(username=user_name).first() if user_name else None
+        if user:
+            request.data['user'] = user.id
+        serializer = Cartserializer(data=request.data) #POST only with the ID of the product and User
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -88,7 +89,7 @@ def cart_list(request):
 @api_view(['GET', 'POST'])
 def single_cart(request,pk):
     try:
-        cart=Cart.objects.get(pk=pk)
+        cart=Cart.objects.get(pk=pk) #Get the cart by ID
     except Cart.DoesNotExist:
         # Whoopsie
         return HttpResponseNotFound(
@@ -102,7 +103,7 @@ def single_cart(request,pk):
 @api_view(['GET', 'DELETE'])
 def delete_cart(request,pk):
     try:
-        product = Cart.objects.filter(products_id=pk)
+        product = Cart.objects.filter(products_id=pk) #Get the cart by ID
     except Cart.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -115,12 +116,12 @@ def delete_cart(request,pk):
 def update_cart(request,pk):
     print(request.data)
     try:
-        product = Cart.objects.get(pk=pk)
+        product = Cart.objects.get(pk=pk) # Get the cart by ID
     except Cart.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     request.method == 'PUT'
-    serializer = Cartserializer(product, data=request.data)
+    serializer = Cartserializer(product, data=request.data) 
     if serializer.is_valid():
         serializer.save()
         print ('Update Success')
@@ -138,17 +139,15 @@ def my_view(request):
 def save_checkout_data(request):
     if request.method == 'POST':
         cartlist = request.data.get('cartlist')
-        print (cartlist,'cartlist')
-        user_id = request.data.get('cartlist')[0]['user']
-        print(user_id,'userrrrrrr')
+        user_id = request.data.get('cartlist')[0]['user'] # Get the User
+        user = User.objects.filter(id=user_id).first() # Get the User from database
         order = Order.objects.create() # Create the order
         for cart in cartlist:
             product = cart['products']
-            print (product.get('id'))
-            product = Products.objects.get(id=product.get('id'))
+            product = Products.objects.get(id=product.get('id')) # Get the product by ID
             quantity = cart['quantity']
-            OrderProduct.objects.create(order=order, product=product, quantity=quantity)
-        Cart.objects.filter(user=user_id).delete() # delete the cart
+            OrderProduct.objects.create(order=order, product=product, quantity=quantity, user=user)
+        Cart.objects.filter(user=user_id).delete() # delete the cart after finished
 
         return Response({'success': True}, status=status.HTTP_201_CREATED)
     elif request.method == 'GET':

@@ -18,20 +18,21 @@ class Products(models.Model):
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE ,null=True)
     products = models.ForeignKey(Products, on_delete=models.CASCADE,unique=True)
-    quantity=models.SmallIntegerField(max_length=10)
+    quantity=models.SmallIntegerField()
 
 
 
 class Order(models.Model):
     products = models.ManyToManyField(Products)
     order_date=models.DateField(auto_now_add=True)
-    quantity=models.SmallIntegerField(max_length=10,null=True)
-
+    quantity=models.SmallIntegerField(null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE ,null=True)
 
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Products, on_delete=models.CASCADE)
-    quantity=models.SmallIntegerField(max_length=10)
+    quantity=models.SmallIntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE ,null=True)
 
  
 
