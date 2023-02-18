@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from product.serialyzer import Productserializer, Cartserializer,CartSerializerTwo,OrderSerializer
 from product.models import OrderProduct, Products,User,Order,Cart
 import json
+from django.contrib.auth.decorators import login_required
 
 
 @api_view(['GET', 'POST'])
@@ -69,10 +70,18 @@ def cart_list(request):
     """
     List of all the cart , or create a new cart.
     """
+    user_name=request.query_params.get('username')
     if request.method == 'GET':
-        carts = Cart.objects.all() #get all the cart 
-        serializer = CartSerializerTwo(carts, many=True) #get all the cart with the details of the product 
-        return Response(serializer.data)
+        print (user_name)
+        user = User.objects.filter(username=user_name).first()
+        if user:
+            request.data['user'] = user.id
+            print (user.id,'user')
+            carts = Cart.objects.filter(user=user.id)
+            print (carts.values())
+            serializer = CartSerializerTwo(carts, many=True)
+            return Response(serializer.data)
+    # return Response([])
     elif request.method == 'POST': 
         print (request.data)
         user_name=(request.data.get('user'))
