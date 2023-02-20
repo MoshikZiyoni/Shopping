@@ -81,19 +81,33 @@ def cart_list(request):
             print (carts.values())
             serializer = CartSerializerTwo(carts, many=True)
             return Response(serializer.data)
-    # return Response([])
-    elif request.method == 'POST': 
-        print (request.data)
-        user_name=(request.data.get('user'))
-        user = User.objects.filter(username=user_name).first() if user_name else None
-        if user:
-            request.data['user'] = user.id
-        serializer = Cartserializer(data=request.data) #POST only with the ID of the product and User
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    elif request.method == 'POST':
+        user_name = request.data.get('user')
+        product_id = request.data.get('products')
+        quantity = request.data.get('quantity')
+        user = User.objects.filter(username=user_name).first()
 
+        # Check if the user already has a cart for the given product
+        cart = Cart.objects.filter(user=user, products=product_id).first()
+
+        if cart:
+            # Update the quantity of the existing cart
+            cart.quantity += quantity
+            cart.save()
+            serializer = Cartserializer(cart)
+            return Response(serializer.data)
+        else:
+            # Create a new cart instance
+            if user:
+                request.data['user'] = user.id
+            serializer = Cartserializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
 
 @api_view(['GET', 'POST'])
 def single_cart(request,pk):

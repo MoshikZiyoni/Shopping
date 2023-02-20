@@ -6,11 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import requests
-import io
-import urllib.request
-
-
 from urllib.request import urlopen
+
 url = 'http://127.0.0.1:4434/product/api/'
 
 service_obj = Service("C:/Users/moshi/Downloads/chromedriver.exe")
