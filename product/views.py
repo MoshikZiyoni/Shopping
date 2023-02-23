@@ -1,12 +1,13 @@
-from django.http import HttpResponseNotFound, JsonResponse
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from product.serialyzer import Productserializer, Cartserializer,CartSerializerTwo,OrderSerializer
-from product.models import OrderProduct, Products,User,Order,Cart
+from product.models import OrderProduct, Products,User,Order,Cart,Review
 import json
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 
 
 @api_view(['GET', 'POST'])
@@ -171,9 +172,31 @@ def save_checkout_data(request):
             quantity = cart['quantity']
             OrderProduct.objects.create(order=order, product=product, quantity=quantity, user=user)
         Cart.objects.filter(user=user_id).delete() # delete the cart after finished
+        subject = 'Thanks for buying in our store'
+        message = 'Dear {},\n\nThank you for your purchase!'.format(user.username)
+        from_email = 'MoshikShopp@gmail.com'
+        recipient_list = [user.email]
+        send_mail(subject, message, from_email, recipient_list)
 
         return Response({'success': True}, status=status.HTTP_201_CREATED)
     elif request.method == 'GET':
         orders = Order.objects.all()
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
+    
+
+@api_view(['POST'])
+def prodectreview(request,pk):
+    product = Products.objects.get(id=pk)
+    user=request.user
+    data=request.data
+    review=Review.objects.create(
+        user=user,
+        product=product,
+        name=user.first_name,
+        rating=data['rating'],
+        comment=data['comment'],
+    )
+    return Response({'detail':'Review added'})
+    # #1 - Review already exists
+    # alreadyexists=

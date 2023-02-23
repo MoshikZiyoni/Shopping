@@ -34,6 +34,12 @@ class OrderProduct(models.Model):
     quantity=models.SmallIntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE ,null=True)
 
- 
+class Review(models.Model):
+    product = models.ForeignKey(Products, on_delete=models.SET_NULL,null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE ,null=True)
+    comment=models.TextField(max_length=250,blank=True)
+    rate=models.IntegerField(default=0)
+    created_date=models.DateField(auto_now_add=True)
 
-
+    def __str__(self):
+        return str(self.rate)
