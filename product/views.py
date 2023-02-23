@@ -165,6 +165,8 @@ def save_checkout_data(request):
         cartlist = request.data.get('cartlist')
         user_id = request.data.get('cartlist')[0]['user'] # Get the User
         user = User.objects.filter(id=user_id).first() # Get the User from database
+        print (user.username)
+        print (user.email)
         order = Order.objects.create() # Create the order
         for cart in cartlist:
             product = cart['products']
@@ -174,7 +176,7 @@ def save_checkout_data(request):
         Cart.objects.filter(user=user_id).delete() # delete the cart after finished
         subject = 'Thanks for buying in our store'
         message = 'Dear {},\n\nThank you for your purchase!'.format(user.username)
-        from_email = 'MoshikShopp@gmail.com'
+        from_email = 'moshikshopp@gmail.com'
         recipient_list = [user.email]
         send_mail(subject, message, from_email, recipient_list)
 
