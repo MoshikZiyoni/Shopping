@@ -8,6 +8,7 @@ from product.models import OrderProduct, Products,User,Order,Cart,Review
 import json
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+import traceback
 
 
 @api_view(['GET', 'POST'])
@@ -165,8 +166,6 @@ def save_checkout_data(request):
         cartlist = request.data.get('cartlist')
         user_id = request.data.get('cartlist')[0]['user'] # Get the User
         user = User.objects.filter(id=user_id).first() # Get the User from database
-        print (user.username)
-        print (user.email)
         order = Order.objects.create() # Create the order
         for cart in cartlist:
             product = cart['products']
@@ -174,13 +173,17 @@ def save_checkout_data(request):
             quantity = cart['quantity']
             OrderProduct.objects.create(order=order, product=product, quantity=quantity, user=user)
         Cart.objects.filter(user=user_id).delete() # delete the cart after finished
-        subject = 'Thanks for buying in our store'
-        message = 'Dear {},\n\nThank you for your purchase!'.format(user.username)
-        from_email = 'moshikshopp@gmail.com'
-        recipient_list = [user.email]
-        send_mail(subject, message, from_email, recipient_list)
-
-        return Response({'success': True}, status=status.HTTP_201_CREATED)
+        ####Sending an email to the user 
+        try:
+            subject = 'Thanks for buying in our store'
+            message = 'Dear {},\n\nThank you for your purchase we hope to see you next time!'.format(user.username)
+            from_email = 'moshikshopp@gmail.com'
+            recipient_list = [user.email]
+            send_mail(subject, message, from_email, recipient_list)
+            return Response({'success': 'Your purchase is successful! An email has been sent to {}.'.format(user.email)})
+        except Exception as e:
+            traceback.print_exc()
+            return Response({'error': 'There was an error sending the email: {}'.format(e)})
     elif request.method == 'GET':
         orders = Order.objects.all()
         serializer = OrderSerializer(orders, many=True)
