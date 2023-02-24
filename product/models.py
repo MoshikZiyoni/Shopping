@@ -1,8 +1,10 @@
+from datetime import timezone
 from django.db import models
 from django.contrib.auth.models import User
 # from rest_framework.authentication import MyAuthentication
 # from rest_framework.permissions import MyPermission
 from rest_framework import viewsets
+from django.utils import timezone
 
 # Create your models here.
 class Products(models.Model):
@@ -33,6 +35,9 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Products, on_delete=models.CASCADE)
     quantity=models.SmallIntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE ,null=True)
+    created_date = models.DateField(default= timezone.now)
+
+
 
 class Review(models.Model):
     product = models.ForeignKey(Products, on_delete=models.SET_NULL,null=True)

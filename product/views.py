@@ -3,13 +3,13 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from product.serialyzer import Productserializer, Cartserializer,CartSerializerTwo,OrderSerializer
+from product.serialyzer import OrderProductSerializer, Productserializer, Cartserializer,CartSerializerTwo,OrderSerializer
 from product.models import OrderProduct, Products,User,Order,Cart,Review
 import json
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 import traceback
-
+from django.utils import timezone
 
 @api_view(['GET', 'POST'])
 def single_product(request,pk):
@@ -165,13 +165,17 @@ def save_checkout_data(request):
     if request.method == 'POST':
         cartlist = request.data.get('cartlist')
         user_id = request.data.get('cartlist')[0]['user'] # Get the User
+        print (user_id,'!!!!!!!!!!!!!!!!!!!!!!!!!')
         user = User.objects.filter(id=user_id).first() # Get the User from database
+        print (user,"@@@@@@@@@@@@@@@@@@@@@@")
         order = Order.objects.create() # Create the order
         for cart in cartlist:
             product = cart['products']
             product = Products.objects.get(id=product.get('id')) # Get the product by ID
             quantity = cart['quantity']
-            OrderProduct.objects.create(order=order, product=product, quantity=quantity, user=user)
+            order_product = OrderProduct.objects.create(order=order, product=product, quantity=quantity, user=user)
+            order_product.created_date = timezone.now().strftime('%Y-%m-%d') # Set the created_date to the current date in the format 'YYYY-MM-DD'
+            order_product.save()
         Cart.objects.filter(user=user_id).delete() # delete the cart after finished
         ####Sending an email to the user 
         try:
@@ -188,6 +192,21 @@ def save_checkout_data(request):
         orders = Order.objects.all()
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
+
+
+@api_view(['GET'])
+def allorder(request):
+    user_name=request.query_params.get('username')
+    user = User.objects.filter(username=user_name).first()
+    if user:
+        request.data['user'] = user.id
+        print (user.id,'user')
+    order = OrderProduct.objects.filter(user=user.id)
+    serializer = OrderProductSerializer(order, many=True)
+    return Response(serializer.data)
+
+    
+
     
 
 @api_view(['POST'])
