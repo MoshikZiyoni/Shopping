@@ -19,7 +19,7 @@ driver.maximize_window()
 time.sleep(5)
 ccc = 0
 a = 0
-for i in range(20):
+for i in range(30):
     ccc = int(ccc)+1
     a = int(a)+1
     ccc = str(ccc)
