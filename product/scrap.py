@@ -14,12 +14,12 @@ service_obj = Service("C:/Users/moshi/Downloads/chromedriver.exe")
 
 driver = webdriver.Chrome(service=service_obj)
 
-driver.get('https://www.realwatersports.com/collections/surfboards')
+driver.get('https://www.realwatersports.com/collections/men')
 driver.maximize_window()
 time.sleep(5)
 ccc = 0
 a = 0
-for i in range(30):
+for i in range(10):
     ccc = int(ccc)+1
     a = int(a)+1
     ccc = str(ccc)
